@@ -1,0 +1,29 @@
+#! /bin/sh
+#
+#   Examples build helper
+#   Syntax: build all | clean
+#
+#   This controls whether we get debug or release builds
+test -z "$BOOM_MODEL" && BOOM_MODEL=debug
+
+CFLAGS=`pkg-config --cflags opencv`
+LDFLAGS="-L/opt/local/lib -lopencv_core -lopencv_highgui -lopencv_objdetect -lopencv_imgproc"
+
+if [ /$1/ = /all/ ]; then
+    echo "Building C examples..."
+    for MAIN in `egrep -l "main\(" *.cpp`; do
+        echo "$MAIN"
+        ./c -p $CFLAGS $LDFLAGS -g -q -l $MAIN
+    done
+elif [ /$1/ = /clean/ ]; then
+    echo "Cleaning C examples directory..."
+    rm -f *.opp *.lst core
+    for MAIN in `egrep -l "main\(" *.cpp`; do
+        rm -f `basename $MAIN .cpp```
+    done
+elif [ -f $1.cpp ]; then
+    echo "$1"
+    ./c -p $CFLAGS $LDFLAGS -g -q -l $1
+else
+    echo "syntax: build all | clean"
+fi
